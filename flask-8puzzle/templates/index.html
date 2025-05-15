@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>8-Puzzle RBFS Solver</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
+    <title>8 Puzzle Solver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <h1>8-Puzzle RBFS Solver</h1>
-  <div id="puzzle-container"></div>
-  <div class="controls">
-    <button onclick="generatePuzzle()">🔄 Generate</button>
-    <button onclick="solvePuzzle()">🧠 Solve</button>
-    <button onclick="nextStep()">➡️ Next</button>
-  </div>
-  <div id="info">Step: 0 | Time: 0.0s</div>
-  <script src="/static/js/puzzle.js"></script>
+    <div class="container">
+        <h1>8 Puzzle Solver</h1>
+        <form method="POST">
+            <label>Enter the board (3x3, rows separated by new lines, numbers separated by spaces):</label><br>
+            <textarea name="board" rows="4" cols="30"></textarea><br>
+            <input type="submit" value="Submit">
+        </form>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+        {% if board %}
+            <h3>Board:</h3>
+            <table>
+                {% for row in board %}
+                    <tr>
+                        {% for cell in row %}
+                            <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
 </body>
 </html>
