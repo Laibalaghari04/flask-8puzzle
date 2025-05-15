@@ -2,6 +2,43 @@
 <html>
 <head>
     <title>8 Puzzle Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .tile {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            user-select: none;
+        }
+        .blank {
+            background-color: #ddd;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        h3 {
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
     <h1>8 Puzzle Solver</h1>
@@ -9,30 +46,86 @@
     <form method="post">
         <label for="difficulty">Select difficulty:</label>
         <select id="difficulty" name="difficulty">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="low" {% if board and difficulty == 'low' %}selected{% endif %}>Low</option>
+            <option value="medium" {% if board and difficulty == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="high" {% if board and difficulty == 'high' %}selected{% endif %}>High</option>
         </select>
         <input type="submit" value="Solve">
     </form>
 
     {% if board %}
         <h3>Initial Board:</h3>
-        <pre>
-{% for row in board %}
-{{ row }}
-{% endfor %}
-        </pre>
+        <div id="board" class="board"></div>
 
         <h3>Moves taken to solve: {{ moves }}</h3>
 
-        <h3>Solution Steps:</h3>
-        <pre>
-{% for step in solution %}
-{{ step }}
---------
-{% endfor %}
-        </pre>
+        <button id="startBtn">Start Animation</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="resetBtn" disabled>Reset</button>
+
+        <script>
+            const solutionSteps = {{ solution | tojson }};
+            const boardElement = document.getElementById('board');
+            let currentStep = 0;
+            let intervalId = null;
+
+            function renderBoard(step) {
+                boardElement.innerHTML = '';
+                const rows = solutionSteps[step].split('\n');
+                for (let r = 0; r < 3; r++) {
+                    const nums = rows[r].split(' ');
+                    for (let c = 0; c < 3; c++) {
+                        const tile = document.createElement('div');
+                        tile.classList.add('tile');
+                        if (nums[c] === '0') {
+                            tile.classList.add('blank');
+                            tile.textContent = '';
+                        } else {
+                            tile.textContent = nums[c];
+                        }
+                        boardElement.appendChild(tile);
+                    }
+                }
+            }
+
+            function startAnimation() {
+                if (intervalId) return; // already running
+                intervalId = setInterval(() => {
+                    if (currentStep >= solutionSteps.length) {
+                        clearInterval(intervalId);
+                        intervalId = null;
+                        document.getElementById('pauseBtn').disabled = true;
+                        return;
+                    }
+                    renderBoard(currentStep);
+                    currentStep++;
+                }, 1000);
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('resetBtn').disabled = false;
+            }
+
+            function pauseAnimation() {
+                clearInterval(intervalId);
+                intervalId = null;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+            }
+
+            function resetAnimation() {
+                pauseAnimation();
+                currentStep = 0;
+                renderBoard(currentStep);
+                document.getElementById('resetBtn').disabled = true;
+            }
+
+            // Initially render the first board state
+            renderBoard(0);
+
+            document.getElementById('startBtn').addEventListener('click', startAnimation);
+            document.getElementById('pauseBtn').addEventListener('click', pauseAnimation);
+            document.getElementById('resetBtn').addEventListener('click', resetAnimation);
+        </script>
     {% endif %}
 </body>
 </html>
