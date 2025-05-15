@@ -2,31 +2,37 @@
 <html>
 <head>
     <title>8 Puzzle Solver</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>8 Puzzle Solver</h1>
-        <form method="POST">
-            <label>Enter the board (3x3, rows separated by new lines, numbers separated by spaces):</label><br>
-            <textarea name="board" rows="4" cols="30"></textarea><br>
-            <input type="submit" value="Submit">
-        </form>
-        {% if message %}
-            <p>{{ message }}</p>
-        {% endif %}
-        {% if board %}
-            <h3>Board:</h3>
-            <table>
-                {% for row in board %}
-                    <tr>
-                        {% for cell in row %}
-                            <td>{{ cell }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
-        {% endif %}
-    </div>
+    <h1>8 Puzzle Solver</h1>
+
+    <form method="post">
+        <label for="difficulty">Select difficulty:</label>
+        <select id="difficulty" name="difficulty">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <input type="submit" value="Solve">
+    </form>
+
+    {% if board %}
+        <h3>Initial Board:</h3>
+        <pre>
+{% for row in board %}
+{{ row }}
+{% endfor %}
+        </pre>
+
+        <h3>Moves taken to solve: {{ moves }}</h3>
+
+        <h3>Solution Steps:</h3>
+        <pre>
+{% for step in solution %}
+{{ step }}
+--------
+{% endfor %}
+        </pre>
+    {% endif %}
 </body>
 </html>
